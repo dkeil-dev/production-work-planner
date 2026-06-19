@@ -1,0 +1,10 @@
+package com.example.production_work_planner.exception;
+
+import java.time.LocalDateTime;
+
+public record ErrorResponse(
+        LocalDateTime timestamp,
+        int status,
+        String message
+) {
+}

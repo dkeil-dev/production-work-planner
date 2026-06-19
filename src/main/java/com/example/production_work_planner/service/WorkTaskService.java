@@ -3,6 +3,8 @@ package com.example.production_work_planner.service;
 
 import com.example.production_work_planner.dto.CreateWorkTaskRequest;
 import com.example.production_work_planner.entity.WorkTask;
+import com.example.production_work_planner.enums.TaskStatus;
+import com.example.production_work_planner.exception.WorkTaskNotFoundException;
 import com.example.production_work_planner.repository.WorkTaskRepository;
 import org.springframework.stereotype.Service;
 
@@ -30,16 +32,21 @@ public class WorkTaskService {
         return repository.save(task);
 
 
-
     }
 
-    public WorkTask getById(Long id){
+    public WorkTask getById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Task not found"));
+                .orElseThrow(() -> new WorkTaskNotFoundException(id));
     }
 
     public List<WorkTask> getAll() {
         return repository.findAll();
+    }
+
+    public WorkTask updateStatus(Long id, TaskStatus status){
+        WorkTask task = getById(id);
+        task.changeStatus(status);
+        return repository.save(task);
     }
 
 }
