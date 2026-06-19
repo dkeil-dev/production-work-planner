@@ -51,13 +51,11 @@ public class WorkTask {
 
     public WorkTask(String title,
                     String description,
-                    TaskStatus status,
                     TaskPriority priority,
                     ProductionArea productionArea,
                     String assigneeName,
                     LocalDate plannedStartDate,
-                    LocalDate plannedEndDate,
-                    LocalDateTime createdAt
+                    LocalDate plannedEndDate
     ) {
         if (title == null || title.isBlank()) {
             throw new IllegalArgumentException("Title cannot be empty");
