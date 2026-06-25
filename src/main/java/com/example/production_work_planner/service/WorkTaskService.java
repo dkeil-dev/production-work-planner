@@ -43,10 +43,11 @@ public class WorkTaskService {
         return repository.findAll();
     }
 
-    public WorkTask updateStatus(Long id, TaskStatus status){
+    public WorkTask updateStatus(Long id, TaskStatus status) {
         WorkTask task = getById(id);
         task.changeStatus(status);
         return repository.save(task);
     }
+
 
 }

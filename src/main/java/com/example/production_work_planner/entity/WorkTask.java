@@ -161,6 +161,4 @@ public class WorkTask {
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
-
-
 }
