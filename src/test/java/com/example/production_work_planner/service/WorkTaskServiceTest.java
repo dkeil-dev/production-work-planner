@@ -1,5 +1,6 @@
 package com.example.production_work_planner.service;
 
+import com.example.production_work_planner.dto.CreateWorkTaskRequest;
 import com.example.production_work_planner.entity.WorkTask;
 import com.example.production_work_planner.enums.ProductionArea;
 import com.example.production_work_planner.enums.TaskPriority;
@@ -59,6 +60,35 @@ class WorkTaskServiceTest {
 
         verify(repository).findById(1L);
         verify(repository).save(task);
+
+    }
+
+    @Test
+    void shouldCreateTask() {
+        WorkTaskRepository repository = mock(WorkTaskRepository.class);
+        WorkTaskService service = new WorkTaskService(repository);
+
+        CreateWorkTaskRequest request = new CreateWorkTaskRequest();
+        request.setTitle("Prepare report");
+        request.setDescription("Weekly production report");
+        request.setPriority(TaskPriority.NORMAL);
+        request.setProductionArea(ProductionArea.QUALITY_CONTROL);
+        request.setAssigneeName("Ivanov");
+        request.setPlannedStartDate(LocalDate.now());
+        request.setPlannedEndDate(LocalDate.now().plusDays(1));
+
+        when(repository.save(any(WorkTask.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        WorkTask result = service.create(request);
+
+        assertEquals("Prepare report", result.getTitle());
+        assertEquals(TaskStatus.NEW, result.getStatus());
+        assertEquals(TaskPriority.NORMAL, result.getPriority());
+        assertEquals(ProductionArea.QUALITY_CONTROL, result.getProductionArea());
+        assertNotNull(result.getCreatedAt());
+
+        verify(repository).save(any(WorkTask.class));
 
     }
 

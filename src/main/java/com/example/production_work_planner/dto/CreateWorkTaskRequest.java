@@ -53,4 +53,32 @@ public class CreateWorkTaskRequest {
     public LocalDate getPlannedStartDate() {
         return plannedStartDate;
     }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setPriority(TaskPriority priority) {
+        this.priority = priority;
+    }
+
+    public void setProductionArea(ProductionArea productionArea) {
+        this.productionArea = productionArea;
+    }
+
+    public void setAssigneeName(String assigneeName) {
+        this.assigneeName = assigneeName;
+    }
+
+    public void setPlannedStartDate(LocalDate plannedStartDate) {
+        this.plannedStartDate = plannedStartDate;
+    }
+
+    public void setPlannedEndDate(LocalDate plannedEndDate) {
+        this.plannedEndDate = plannedEndDate;
+    }
 }
