@@ -7,6 +7,7 @@ import com.example.production_work_planner.enums.TaskPriority;
 import com.example.production_work_planner.enums.TaskStatus;
 import com.example.production_work_planner.exception.WorkTaskNotFoundException;
 import com.example.production_work_planner.repository.WorkTaskRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -18,11 +19,20 @@ import static org.mockito.Mockito.*;
 
 class WorkTaskServiceTest {
 
+    private WorkTaskRepository repository;
+    private WorkTaskService service;
+
+    @BeforeEach
+    void setUp() {
+         repository = mock(WorkTaskRepository.class);
+         service = new WorkTaskService(repository);
+
+    }
+
 
     @Test
     void shouldReturnTaskById() {
-        WorkTaskRepository repository = mock(WorkTaskRepository.class);
-        WorkTaskService service = new WorkTaskService(repository);
+
 
         WorkTask task = createTask();
 

@@ -2,11 +2,13 @@ package com.example.production_work_planner.controller;
 
 import com.example.production_work_planner.dto.CreateWorkTaskRequest;
 import com.example.production_work_planner.dto.UpdateTaskStatusRequest;
+import com.example.production_work_planner.dto.WorkTaskResponse;
 import com.example.production_work_planner.entity.WorkTask;
 import com.example.production_work_planner.enums.TaskPriority;
 import com.example.production_work_planner.enums.TaskStatus;
 import com.example.production_work_planner.service.WorkTaskService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,33 +23,41 @@ public class WorkTaskController {
         this.service = service;
     }
 
+
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public WorkTask create(@Valid @RequestBody CreateWorkTaskRequest request) {
-        return service.create(request);
+    public WorkTaskResponse create(@Valid @RequestBody CreateWorkTaskRequest request) {
+        WorkTask task = service.create(request);
+        return WorkTaskResponse.from(task);
     }
 
     @GetMapping
-    public List<WorkTask> getAll(
-        @RequestParam(required = false)TaskStatus status,
-        @RequestParam(required = false)TaskPriority priority
-        ){
-        return service.findTasks(status, priority);
+    public List<WorkTaskResponse> getAll(
+            @RequestParam(required = false) TaskStatus status,
+            @RequestParam(required = false) TaskPriority priority
+    ) {
+
+        return service.findTasks(status, priority)
+                .stream()
+                .map(WorkTaskResponse::from)
+                .toList();
     }
 
     @GetMapping("/{id}")
-    public WorkTask getById(@PathVariable Long id) {
-        return service.getById(id);
+    public WorkTaskResponse getById(@PathVariable Long id) {
+        WorkTask task = service.getById(id);
+        return WorkTaskResponse.from(task);
     }
 
     @PatchMapping("/{id}/status")
-    public WorkTask changeStatus(
+    public WorkTaskResponse changeStatus(
             @PathVariable Long id,
             @Valid @RequestBody UpdateTaskStatusRequest request
-    ){
-        return service.updateStatus(id, request.getStatus());
+    ) {
+        WorkTask task = service.updateStatus(id, request.getStatus());
+        return WorkTaskResponse.from(task);
 
     }
-
 
 
 }
