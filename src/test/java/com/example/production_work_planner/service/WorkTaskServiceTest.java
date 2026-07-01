@@ -10,6 +10,7 @@ import com.example.production_work_planner.repository.WorkTaskRepository;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -90,6 +91,79 @@ class WorkTaskServiceTest {
 
         verify(repository).save(any(WorkTask.class));
 
+    }
+
+    @Test
+    void shouldFindTasksByStatusAndPriority() {
+        WorkTaskRepository repository = mock(WorkTaskRepository.class);
+        WorkTaskService service = new WorkTaskService(repository);
+
+        WorkTask task = createTask();
+
+        when(repository.findByStatusAndPriority(TaskStatus.NEW, TaskPriority.NORMAL))
+                .thenReturn(List.of(task));
+
+        List<WorkTask> result = service.findTasks(TaskStatus.NEW, TaskPriority.NORMAL);
+
+        assertEquals(1, result.size());
+        assertSame(task, result.get(0));
+
+        verify(repository).findByStatusAndPriority(TaskStatus.NEW, TaskPriority.NORMAL);
+        verify(repository, never()).findAll();
+    }
+
+    @Test
+    void shouldFindTasksByStatus() {
+        WorkTaskRepository repository = mock(WorkTaskRepository.class);
+        WorkTaskService service = new WorkTaskService(repository);
+
+        WorkTask task = createTask();
+
+        when(repository.findByStatus(TaskStatus.NEW))
+                .thenReturn(List.of(task));
+
+        List<WorkTask> result = service.findTasks(TaskStatus.NEW, null);
+
+        assertEquals(1, result.size());
+        assertSame(task, result.get(0));
+
+        verify(repository).findByStatus(TaskStatus.NEW);
+        verify(repository, never()).findAll();
+    }
+
+    @Test
+    void shouldFindTasksByPriority() {
+        WorkTaskRepository repository = mock(WorkTaskRepository.class);
+        WorkTaskService service = new WorkTaskService(repository);
+
+        WorkTask task = createTask();
+
+        when(repository.findByPriority(TaskPriority.NORMAL))
+                .thenReturn(List.of(task));
+
+        List<WorkTask> result = service.findTasks(null, TaskPriority.NORMAL);
+
+        assertEquals(1, result.size());
+        assertSame(task, result.get(0));
+
+        verify(repository).findByPriority(TaskPriority.NORMAL);
+        verify(repository, never()).findAll();
+    }
+
+    @Test
+    void shouldFindAllTasksWhenNoFiltersProvided() {
+        WorkTaskRepository repository = mock(WorkTaskRepository.class);
+        WorkTaskService service = new WorkTaskService(repository);
+
+        WorkTask task = createTask();
+
+        when(repository.findAll()).thenReturn(List.of(task));
+
+        List<WorkTask> result = service.findTasks(null, null);
+
+        assertEquals(1, result.size());
+        assertSame(task, result.get(0));
+        verify(repository).findAll();
     }
 
 

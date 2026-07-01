@@ -3,6 +3,8 @@ package com.example.production_work_planner.controller;
 import com.example.production_work_planner.dto.CreateWorkTaskRequest;
 import com.example.production_work_planner.dto.UpdateTaskStatusRequest;
 import com.example.production_work_planner.entity.WorkTask;
+import com.example.production_work_planner.enums.TaskPriority;
+import com.example.production_work_planner.enums.TaskStatus;
 import com.example.production_work_planner.service.WorkTaskService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +27,11 @@ public class WorkTaskController {
     }
 
     @GetMapping
-    public List<WorkTask> getAll() {
-        return service.getAll();
+    public List<WorkTask> getAll(
+        @RequestParam(required = false)TaskStatus status,
+        @RequestParam(required = false)TaskPriority priority
+        ){
+        return service.findTasks(status, priority);
     }
 
     @GetMapping("/{id}")

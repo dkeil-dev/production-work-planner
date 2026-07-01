@@ -3,6 +3,7 @@ package com.example.production_work_planner.service;
 
 import com.example.production_work_planner.dto.CreateWorkTaskRequest;
 import com.example.production_work_planner.entity.WorkTask;
+import com.example.production_work_planner.enums.TaskPriority;
 import com.example.production_work_planner.enums.TaskStatus;
 import com.example.production_work_planner.exception.WorkTaskNotFoundException;
 import com.example.production_work_planner.repository.WorkTaskRepository;
@@ -49,5 +50,21 @@ public class WorkTaskService {
         return repository.save(task);
     }
 
+    public List<WorkTask> findTasks(TaskStatus status, TaskPriority priority) {
+        if (status != null && priority != null) {
+            return repository.findByStatusAndPriority(status, priority);
+        }
+
+        if (status != null) {
+            return repository.findByStatus(status);
+        }
+
+        if (priority != null) {
+            return repository.findByPriority(priority);
+        }
+
+        return repository.findAll();
+
+    }
 
 }
