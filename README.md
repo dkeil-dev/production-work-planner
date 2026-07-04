@@ -1,194 +1,249 @@
 # Production Work Planner
 
-Production Work Planner is a REST API for planning and tracking production work tasks.
+Production Work Planner — это REST API для планирования и контроля производственных задач.
 
-The project was created as a learning and portfolio project to practice backend development with Java, Spring Boot, PostgreSQL, REST API design, validation, exception handling, DTOs, testing, and OpenAPI documentation.
+Идея проекта основана на типовых задачах производственного отдела: создание задач, назначение ответственного, контроль статуса, приоритета и сроков выполнения. Проект реализован как backend MVP без пользовательского интерфейса, но с документацией API через Swagger/OpenAPI.
 
-## Features
 
-- Create production work tasks
-- Get all tasks
-- Get task by ID
-- Update task status
-- Filter tasks by status
-- Filter tasks by priority
-- Filter tasks by status and priority
-- Validate incoming requests
-- Return structured error responses
-- Provide API documentation with Swagger/OpenAPI
+## Возможности
 
-## Technology Stack
+* Создание производственной задачи
+* Получение списка задач
+* Получение задачи по id
+* Фильтрация задач по статусу
+* Фильтрация задач по приоритету
+* Фильтрация задач по статусу и приоритету одновременно
+* Изменение статуса задачи
+* Просмотр просроченных задач
+* Проверка входных данных через validation
+* Обработка ошибок через global exception handler
+* Документация API через Swagger/OpenAPI
+* Автоматические тесты сервисного и web-слоя
 
-- Java 21
-- Spring Boot
-- Spring Web
-- Spring Data JPA
-- PostgreSQL
-- Jakarta Validation
-- JUnit 5
-- Mockito
-- MockMvc
-- Maven
-- Swagger / OpenAPI
+## Технологии
 
-## Project Structure
+* Java 21
+* Spring Boot
+* Spring Web
+* Spring Data JPA
+* Hibernate
+* PostgreSQL
+* Maven
+* JUnit 5
+* Mockito
+* MockMvc
+* Swagger / OpenAPI
+
+## Архитектура проекта
+
+Проект построен по классической layered architecture:
 
 ```text
-controller  - REST controllers
-service     - business logic
-repository  - data access layer
-entity      - JPA entities
-dto         - request and response DTOs
-enums       - domain enums
-exception   - custom exceptions and global exception handling
-config      - application configuration
+Controller -> Service -> Repository -> Database
 ```
 
-## Architecture
+Основные слои:
 
-The application follows a simple layered architecture:
+* `controller` — REST endpoints
+* `service` — бизнес-логика
+* `repository` — работа с базой данных через Spring Data JPA
+* `entity` — JPA-сущности
+* `dto` — объекты для входящих и исходящих данных API
+* `exception` — пользовательские исключения и обработка ошибок
+* `enums` — статусы, приоритеты и производственные участки
+* `config` — конфигурация приложения
 
-- Controller → Service → Repository → PostgreSQL
-- Controller handles HTTP requests and responses.
-- Service contains business logic.
-- Repository provides access to the database through Spring Data JPA.
-- Entity represents the internal domain model.
-- DTOs are used for API input and output.
+## Основная сущность
 
-## Main Entity
+Главная сущность проекта — `WorkTask`.
 
-WorkTask represents a production task.
+Задача содержит:
 
-Main fields:
+* id
+* название
+* описание
+* статус
+* приоритет
+* производственный участок
+* имя ответственного
+* плановую дату начала
+* плановую дату окончания
+* дату создания
+* дату обновления
 
-- id
-- title
-- description
-- status
-- priority
-- production area
-- assignee name
-- planned start date
-- planned end date 
-- created at
-- updated at
+Статусы задачи:
 
-The task also has calculated overdue status.
-
-## API Endpoints
-
-Create task
-
-`POST /api/tasks`
-
-
-Request body:
-```
-{
-"title": "Prepare report",
-"description": "Weekly production report",
-"priority": "NORMAL",
-"productionArea": "QUALITY_CONTROL",
-"assigneeName": "Ivanov",
-"plannedStartDate": "2026-07-01",
-"plannedEndDate": "2026-07-02"
-}
-```
-### Get all tasks
-
-`GET /api/tasks`
-### Filter tasks
-
-```
-GET /api/tasks?status=NEW
-GET /api/tasks?priority=NORMAL
-GET /api/tasks?status=NEW&priority=NORMAL
-```
-### Get task by ID
-
-`GET /api/tasks/{id}`
-### Update task status
-
-`PATCH /api/tasks/{id}/status`
-
-Request body:
-```
-{
-"status": "IN_PROGRESS"
-}
-```
-### Task Statuses
-````
+```text
 NEW
 IN_PROGRESS
 DONE
-````
-### Task Priorities
-````
+```
+
+Приоритеты:
+
+```text
 NORMAL
 HIGH
-````
-### Production Areas
-````
+```
+
+Пример производственных участков:
+
+```text
 PREPARATION
 PRIMARY_PROCESSING
 SECONDARY_PROCESSING
 FINAL_PROCESSING
 QUALITY_CONTROL
-````
-### Validation
-
-The application validates incoming requests.
-
-Examples:
-
-- title must not be blank
-- priority must not be null
-- production area must not be null
-- planned end date must not be null
-- planned end date cannot be before planned start date
-
-Invalid requests return ```400 Bad Request```
-
-### Error Handling
-
-The application uses global exception handling.
-
-Examples:
-
-- `404 Not Found` when task does not exist
-- `400 Bad Request` for invalid input
-- `409 Conflict` for invalid state changes
-
-Example error response:
 ```
+
+## API endpoints
+
+### Создать задачу
+
+```http
+POST /api/tasks
+```
+
+Пример тела запроса:
+
+```json
 {
-"timestamp": "2026-07-01T12:00:00",
-"status": 404,
-"message": "Work task not found with id: 999"
+  "title": "Prepare production report",
+  "description": "Prepare weekly report for quality control",
+  "priority": "NORMAL",
+  "productionArea": "QUALITY_CONTROL",
+  "assigneeName": "Ivanov",
+  "plannedStartDate": "2026-07-01",
+  "plannedEndDate": "2026-07-05"
+}
+```
+
+### Получить все задачи
+
+```http
+GET /api/tasks
+```
+
+### Получить задачу по id
+
+```http
+GET /api/tasks/{id}
+```
+
+### Получить задачи по статусу
+
+```http
+GET /api/tasks?status=NEW
+```
+
+### Получить задачи по приоритету
+
+```http
+GET /api/tasks?priority=HIGH
+```
+
+### Получить задачи по статусу и приоритету
+
+```http
+GET /api/tasks?status=NEW&priority=HIGH
+```
+
+### Изменить статус задачи
+
+```http
+PATCH /api/tasks/{id}/status
+```
+### Получить просроченные задачи
+
+```http
+GET /api/tasks/overdue
+
+Пример тела запроса:
+
+```json
+{
+  "status": "IN_PROGRESS"
+}
+```
+
+## Пример сценария использования
+
+Типовой сценарий работы с системой:
+
+```md
+Пример последовательности запросов:
+
+```http
+POST /api/tasks
+GET /api/tasks
+GET /api/tasks?status=NEW
+GET /api/tasks?priority=HIGH
+GET /api/tasks/overdue
+PATCH /api/tasks/{id}/status
+GET /api/tasks?status=DONE
+```
+
+## Validation
+
+В проекте используется validation для входящих DTO.
+
+Примеры правил:
+
+* название задачи не может быть пустым
+* приоритет обязателен
+* производственный участок обязателен
+* плановая дата окончания обязательна
+* статус при обновлении задачи обязателен
+
+Если входные данные некорректны, API возвращает ошибку со статусом `400 Bad Request`.
+
+## Обработка ошибок
+
+В проекте реализован global exception handler.
+
+Примеры ошибок:
+
+* задача не найдена — `404 Not Found`
+* некорректные данные — `400 Bad Request`
+* недопустимое изменение состояния задачи — `409 Conflict`
+
+Пример ответа при ошибке:
+
+```json
+{
+  "timestamp": "2026-07-04T12:00:00",
+  "status": 404,
+  "message": "Work task not found with id: 999"
 }
 ```
 
 ## Swagger / OpenAPI
 
-Swagger UI is available after application startup:
+После запуска приложения документация API доступна по адресу:
 
-`http://localhost:8080/swagger-ui.html`
+```text
+http://localhost:8080/swagger-ui.html
+```
 
-or:
+или:
 
-`http://localhost:8080/swagger-ui/index.html`
+```text
+http://localhost:8080/swagger-ui/index.html
+```
 
 OpenAPI JSON:
 
-`http://localhost:8080/v3/api-docs`
+```text
+http://localhost:8080/v3/api-docs
+```
 
-## Database Configuration
+## Настройка базы данных
 
-The application uses PostgreSQL.
+Проект использует PostgreSQL.
 
-Example `application.properties:`
-````
+Пример настроек в `application.properties`:
+
+```properties
 spring.datasource.url=jdbc:postgresql://localhost:5432/production_work_planner
 spring.datasource.username=your_username
 spring.datasource.password=your_password
@@ -197,39 +252,82 @@ spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
 spring.jpa.open-in-view=false
-````
+```
 
-Before running the application, create a PostgreSQL database:
+Перед запуском нужно создать базу данных:
 
-`CREATE DATABASE production_work_planner;`
+```sql
+CREATE DATABASE production_work_planner;
+```
 
-## Running the Application
+## Запуск приложения
 
-Run with Maven:
+Собрать проект:
 
-`mvn spring-boot:run`
+```bash
+mvn clean package
+```
 
-Or run the main class from your IDE:
+Запустить приложение:
 
-`ProductionWorkPlannerApplication`
-### Running Tests
-`mvn test`
+```bash
+mvn spring-boot:run
+```
 
-The project includes:
+Или запустить main-класс из IDE.
 
--entity unit tests
--service unit tests with Mockito
--controller tests with MockMvc
-]]
-## Notes
+## Запуск тестов
 
-This project is focused on backend fundamentals:
+```bash
+mvn test
+```
 
-- REST API design
-- layered architecture
-- DTO usage
-- validation
-- exception handling
-- database access with Spring Data JPA
-- automated testing
-- API documentation
+В проекте есть тесты для:
+
+* domain logic
+* service layer
+* controller layer
+* обработки ошибок
+* фильтрации задач
+
+## Что было отработано в проекте
+
+В рамках проекта были отработаны:
+
+* создание REST API на Spring Boot
+* работа с PostgreSQL через Spring Data JPA
+* разделение приложения на слои
+* использование DTO для входящих и исходящих данных
+* validation входных запросов
+* exception handling
+* derived query methods в Spring Data JPA
+* тестирование через JUnit 5, Mockito и MockMvc
+* документирование API через Swagger/OpenAPI
+* работа с Git и Maven
+
+## Roadmap
+
+Возможные направления развития проекта:
+
+* Добавить обновление данных задачи: название, описание, приоритет, сроки и ответственный
+* Добавить историю изменения статусов
+* Добавить комментарии к задачам
+* Выделить пользователей и ответственных в отдельные сущности
+* Добавить роли пользователей
+* Добавить Spring Security
+* Добавить Docker и Docker Compose
+* Добавить миграции базы данных через Liquibase или Flyway
+* Добавить интеграционные тесты с тестовой базой данных
+* Добавить пагинацию и сортировку списка задач
+* Добавить простой frontend или admin UI
+* Подготовить production deployment configuration
+
+Текущая версия сфокусирована на backend fundamentals: REST API, layered architecture, DTO, validation, exception handling, PostgreSQL, Spring Data JPA, automated tests and OpenAPI documentation.
+
+## English Summary
+
+Production Work Planner is a Spring Boot REST API for managing production work tasks.
+
+The project includes task creation, status updates, filtering by status and priority, DTOs, validation, exception handling, PostgreSQL persistence, automated tests and OpenAPI documentation.
+
+The project is based on typical production workflow scenarios: task planning, responsibility assignment, status tracking, priority control and deadline management.
